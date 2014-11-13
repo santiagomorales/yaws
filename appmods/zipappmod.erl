@@ -10,17 +10,17 @@ box(Str) ->
 	{'div', [{class, "box"}],
 		{pre, [], Str}}.
 
-prueba() ->
+search() ->
 	receive
 		{A, Web_pid} ->
 			Mensaje = ets:lookup(tablaETS, A#arg.appmoddata),
 			Web_pid ! {Mensaje}
 	end,
-	prueba().
+	search().
 
 
 out(A) ->
-	prueba ! {A, self()},
+	search ! {A, self()},
 	receive
 		{Mensaje} ->
 			{ehtml,
@@ -79,6 +79,6 @@ procesar_linea(Fd_origen) ->
 
 start() ->
 	register(procesar, spawn(zipappmod, procesar, [])),
-	register(prueba, spawn(zipappmod, prueba, [])),
+	register(search, spawn(zipappmod, search, [])),
 	ets:new(tablaETS, [set, named_table, public, {keypos, #address.postalcode}]),
 	procesar ! {"us_postal_codes.csv"}.
